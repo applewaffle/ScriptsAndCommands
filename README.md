@@ -102,7 +102,13 @@ service. An example would be something like.
 ```bash
 sudo service ssh start
 ```
-***___NOTE___*** that this must be ran with Supper User privaliges.
+***___NOTE___*** that this must be ran with Super User privaliges.
+
+You can also use this program to list the running stats of all the services installed on
+the system with the command:
+```bash
+service --status-all
+```
 
 There are also a couple of scripts in this reposatory that when ran will start or stop
 both the Apache2 and the MySQL servercies.  Those scripts are
@@ -121,6 +127,19 @@ be:
 
 ```bash
 update-rc.d apache2 enable 2
+```
+
+### systemctl
+systemctl works similary to update-rc.d inwhich it can enable and disable services at
+startup and shutdown. The syntax is similar as well.
+```bash
+systemctl enable|disable apache2
+```
+You will need to run this command with evelited privilages.
+
+You can also use this to list all the services and their statuses with the command:
+```bash
+systemctl list-unit-files
 ```
 
 ### wget
