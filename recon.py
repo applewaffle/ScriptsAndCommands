@@ -4,6 +4,9 @@ import subprocess
 import sys
 import time
 
+##########################################################################################
+##########################################################################################
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -14,6 +17,9 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+##########################################################################################
+##########################################################################################
+
 class Port:
 	def __init__(self, attb):
 		self.number = attb[0]
@@ -21,6 +27,9 @@ class Port:
 		self.tcp = attb[2]
 		self.proto = attb[4]
 		self.name = attb[5]
+
+##########################################################################################
+##########################################################################################
 
 class Target:
 	def __init__(self, address)
@@ -58,7 +67,10 @@ NAME = 6
 NMAPSCRIPTS = '/usr/share/nmap/scripts/'
 
 
+##########################################################################################
 # This creates directories for each of the IPs that it was given.
+##########################################################################################
+
 def setUp(ipList):
 	print(OKPLUS + "Creating Directories")
 	for ip in ipList:
@@ -68,7 +80,10 @@ def setUp(ipList):
 		subprocess.call(["touch", ip + "/notes.txt"])
 
 
+##########################################################################################
 # This will Run a basic nmap scan on the IPs 
+##########################################################################################
+
 def nmapScan(ipList):
 	for ip in ipList:
 		tList.append(Target(ip))
@@ -77,8 +92,11 @@ def nmapScan(ipList):
 		output = subprocess.check_output(["nmap", "-sU" ,"-sC", '-sV', '-oA', ip + '/scans/nmap-scan-UDP', ip])
 
 
+##########################################################################################
 # This will parse the nmap scan output for each of the IPs and store the information.
 # It will also look for relative nmap scripts and save a list of them in the IPs dir.
+##########################################################################################
+
 def parseNmap(ipList, proto):
 	for ip in ipList:
 		portInfo[ip] = []
@@ -119,38 +137,53 @@ def parseNmap(ipList, proto):
 		print(INFO + "Nmap Script suggestions for ip " + ip + " are stored in " + bcolors.OKGREEN + ip + '/scriptSuggestions.txt' + bcolors.ENDC)
 
 
+##########################################################################################
 # This will print out all the open ports that were found on each box.
-for ip in ipAddresses:
-	print(INFO + bcolors.OKGREEN + ip + bcolors.ENDC + ' has the open ports:')
-	for i in portInfo[ip]:
-		print('\t' + bcolors.OKBLUE + i[PORT] + bcolors.ENDC + "  " + i[PROTO] + "      " + i[NAME])
+##########################################################################################
+
+def printPorts(ipAddresses):
+	for ip in ipAddresses:
+		print(INFO + bcolors.OKGREEN + ip + bcolors.ENDC + ' has the open ports:')
+		for i in portInfo[ip]:
+			print('\t' + bcolors.OKBLUE + i[PORT] + bcolors.ENDC + "  " + i[PROTO] + "      " + i[NAME])
 
 
+##########################################################################################
 # This will check to see if there are any web servers running on the box
 # and run dirb and nikto on them
-for ip in ipAddresses:
-	for i in portInfo[ip]:
-		if i[PROTO] == 'http' or i[PROTO] == 'https':
-			print(OKPLUS + "Running dirb on ip address " + ip + " port " + i[PORT])
-			output = subprocess.check_output(["dirb", i[PROTO] + '://' + ip + ':' + i[PORT], '-r', '-o', ip + '/scans/dirb-scan-port-' + i[PORT] + '.txt'])
-			print(INFO + "Results stored in " + ip + "/scans/dirb-scan.txt")
-			print(OKPLUS + "Running nikto on ip address " + ip + " port " + i[PORT])
-			output = subprocess.check_output(["nikto", "-h", i[PROTO] + '://' + ip + ':' + i[PORT], '-o', ip + '/scans/nikto-scan-port-' + i[PORT] + '.txt'])
-			print(INFO + "Results stored in " + ip + "/scans/nikto-scan.txt")
+##########################################################################################
+
+def webEnum(ipAddresses):
+	for ip in ipAddresses:
+		for i in portInfo[ip]:
+			if i[PROTO] == 'http' or i[PROTO] == 'https':
+				print(OKPLUS + "Running dirb on ip address " + ip + " port " + i[PORT])
+				output = subprocess.check_output(["dirb", i[PROTO] + '://' + ip + ':' + i[PORT], '-r', '-o', ip + '/scans/dirb-scan-port-' + i[PORT] + '.txt'])
+				print(INFO + "Results stored in " + ip + "/scans/dirb-scan.txt")
+				print(OKPLUS + "Running nikto on ip address " + ip + " port " + i[PORT])
+				output = subprocess.check_output(["nikto", "-h", i[PROTO] + '://' + ip + ':' + i[PORT], '-o', ip + '/scans/nikto-scan-port-' + i[PORT] + '.txt'])
+				print(INFO + "Results stored in " + ip + "/scans/nikto-scan.txt")
 
 
+##########################################################################################
 # This will run a full port scan of each of the IP addresses and exit
-for ip in ipAddresses:
-	print(ip)
-	print(OKPLUS + "Starting full port scan on ip " + ip)
-	process[ip] = subprocess.Popen(['nmap', '-p-', '-oA', ip + '/scans/nmap-full-port-scan', '--max-retries=3', '--max-scan-delay=20ms', ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	line = output.split()
-	print(INFO + 'Process started with PID of ' + bcolors.OKBLUE + str(process[ip].pid) + bcolors.ENDC)
+##########################################################################################
 
-time.sleep(10)
-subprocess.call(['stty','sane'])
-exit()
+def nmapAndExit(ipAddresses):
+	for ip in ipAddresses:
+		print(ip)
+		print(OKPLUS + "Starting full port scan on ip " + ip)
+		process[ip] = subprocess.Popen(['nmap', '-p-', '-oA', ip + '/scans/nmap-full-port-scan', '--max-retries=3', '--max-scan-delay=20ms', ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		line = output.split()
+		print(INFO + 'Process started with PID of ' + bcolors.OKBLUE + str(process[ip].pid) + bcolors.ENDC)
 
+	time.sleep(10)
+	subprocess.call(['stty','sane'])
+	exit()
+
+
+##########################################################################################
+##########################################################################################
 
 if __name__ == '__main__':
 
